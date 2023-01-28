@@ -1,6 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
-using UsersAPI.Data;
+using AccountingService.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

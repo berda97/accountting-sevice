@@ -1,4 +1,4 @@
-﻿namespace UsersAPI.Controllers.models
+﻿namespace AccountingService.Controllers.models
 {
     public class User
     {

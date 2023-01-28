@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using RestSharp;
 
-namespace UsersAPI.Services
+namespace AccountingService.Services
 {
     public class ExchangeRateService
     {

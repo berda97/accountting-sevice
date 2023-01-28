@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UsersAPI.Controllers.models;
+using AccountingService.Controllers.models;
 
-namespace UsersAPI.Data
+namespace AccountingService.Data
 {
     public class SalaryConversionContext : DbContext  //context - baza
     {

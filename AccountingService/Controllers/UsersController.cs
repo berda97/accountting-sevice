@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using UsersAPI.Controllers.models;
-using UsersAPI.Data;
-using UsersAPI.Services;
+using AccountingService.Controllers.models;
+using AccountingService.Data;
+using AccountingService.Services;
 
-namespace UsersAPI.Controllers
+namespace AccountingService.Controllers
 {
     [Route("api/users")]
     [ApiController]
