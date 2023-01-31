@@ -10,12 +10,16 @@ namespace AccountingService.Controllers
     public class UsersController : ControllerBase
     {
         private SalaryConversionContext salaryConversionContext;
+
         private ExchangeRateService exchangeRateService;
+
+        private NetSalaryService netSalaryService;
 
         public UsersController(SalaryConversionContext context) : base()
         {
             salaryConversionContext = context;
             exchangeRateService = new ExchangeRateService();
+            netSalaryService = new NetSalaryService();
         }
 
         [HttpGet]
@@ -43,6 +47,8 @@ namespace AccountingService.Controllers
             return Ok(user);
 
         }
+
+
 
 
         [HttpPost]
@@ -88,10 +94,12 @@ namespace AccountingService.Controllers
             return Ok();
         }
 
+
+
         [HttpGet("{id}/salary")]
-        public IActionResult GetUserSalary(int id, [FromQuery(Name ="currency")] string currency)
+        public IActionResult GetUserSalary(int id, [FromQuery(Name = "currency")] string currency, [FromQuery(Name = "isNetSalary")] bool isNetSalary)
         {
-            int salary = salaryConversionContext.User
+            double salary = salaryConversionContext.User
                 .Where(u => u.ID == id)
                 .Select(u => u.Salary)
                 .SingleOrDefault();
@@ -102,20 +110,34 @@ namespace AccountingService.Controllers
             }
 
             double exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);
+            salary = salary * exchangeRate;
+
+            if (isNetSalary)
+            {
+                double netSalary = netSalaryService.Calculate(salary);
+                return Ok(new
+                {
+                    Value = salary,
+                    Currency = currency,
+                    NetSalary = netSalary
+                });
+            }
 
             return Ok(new
             {
-                Value = salary * exchangeRate,
+                Value = salary,
                 Currency = currency
             });
+
         }
-        
+
 
 
         private IActionResult BadGateway()
         {
             return StatusCode(StatusCodes.Status502BadGateway);
         }
+
     }
 }
 

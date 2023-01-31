@@ -30,7 +30,7 @@ namespace AccountingService.Services
 
             var request = new RestRequest();
             request.Method = Method.Get;
-            request.AddHeader("apikey", "[API-KEY]");
+            request.AddHeader("apikey", "6IRdNpTdHNvBw5bd4ouVVoAgo5WpZA2E");
 
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
