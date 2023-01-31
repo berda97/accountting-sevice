@@ -7,8 +7,6 @@
         const double pensionRate = 0.05;
         public double Calculate( double grossSalary)
         {
-          
-
             double tax = grossSalary * taxRate;
             double socialSecurity = grossSalary * socialSecurityRate;
             double pension = grossSalary * pensionRate;
