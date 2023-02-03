@@ -2,6 +2,7 @@
 using AccountingService.Controllers.models;
 using AccountingService.Data;
 using AccountingService.Services;
+using AccountingService.ErorHanding;
 
 namespace AccountingService.Controllers
 {
@@ -15,130 +16,149 @@ namespace AccountingService.Controllers
 
         private NetSalaryService netSalaryService;
 
+        private Error error;
+
         public UsersController(SalaryConversionContext context) : base()
         {
             salaryConversionContext = context;
             exchangeRateService = new ExchangeRateService();
             netSalaryService = new NetSalaryService();
+            error = new Error();
+
         }
 
         [HttpGet]
         public IActionResult GetAllUsers()
         {
-            var users = salaryConversionContext.User.ToArray(); // izvuci sve user iz tabele(user) 
-            return Ok(new
+            try
             {
-                Count = users.Length,
-                Users = users,
-            });
-
+                var users = salaryConversionContext.User.ToArray(); // izvuci sve user iz tabele(user) 
+                return Ok(new
+                {
+                    Count = users.Length,
+                    Users = users,
+                });
+            }
+            catch (Exception ex)
+            {
+                error.HandleError(ex.HResult);
+            }
         }
-
 
         [HttpGet("{id}")]
         public IActionResult GetUserById(int id)
         {
-            var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
+
+
+                return Ok(user);
             }
-
-            return Ok(user);
-
+            catch (Exception ex)
+            {
+                error.HandleError(ex.HResult);
+            }
         }
-
-
-
 
         [HttpPost]
         public IActionResult CreateUser([FromBody] User request)
         {
-            salaryConversionContext.User.Add(request);
-            int changes = salaryConversionContext.SaveChanges();
-            if (changes == 0)
+            try
             {
-                return BadGateway();
+                salaryConversionContext.User.Add(request);
+                int changes = salaryConversionContext.SaveChanges();
+                return Ok();
             }
-            return Ok();
+            catch (Exception ex)
+            {
+                error.HandleError(ex.HResult);
+            }
         }
 
         [HttpPut]
         public IActionResult UpdateUser([FromBody] User request)
         {
-            salaryConversionContext.User.Update(request);
-            int changes = salaryConversionContext.SaveChanges();
-            if (changes == 0)
+            try
             {
-                return BadGateway();
+                salaryConversionContext.User.Update(request);
+                int changes = salaryConversionContext.SaveChanges();
+
+                return Ok();
             }
 
-            return Ok();
+            catch (Exception ex)
+            {
+                error.HandleError(ex.HResult);
+            }
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteUser(int id)
         {
-            var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
-            if (user == null)
             {
-                return NotFound();
-            }
-            salaryConversionContext.User.Remove(user);
-            int changes = salaryConversionContext.SaveChanges();
+                try
+                {
+                    var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
+                    if (user == null)
+                    {
+                        return NotFound();
+                    }
+                    salaryConversionContext.User.Remove(user);
+                    int changes = salaryConversionContext.SaveChanges();
 
-            if (changes == 0)
-            {
-                return BadGateway();
+
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    error.HandleError(ex.HResult);
+                }
             }
-            return Ok();
         }
 
-
-
         [HttpGet("{id}/salary")]
+
         public IActionResult GetUserSalary(int id, [FromQuery(Name = "currency")] string currency, [FromQuery(Name = "isNetSalary")] bool isNetSalary)
         {
-            double salary = salaryConversionContext.User
-                .Where(u => u.ID == id)
-                .Select(u => u.Salary)
-                .SingleOrDefault();
-
-            if (salary == 0)
+            try
             {
-                return NotFound();
-            }
+                double salary = salaryConversionContext.User
+                    .Where(u => u.ID == id)
+                    .Select(u => u.Salary)
+                    .SingleOrDefault();
 
-            double exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);
-            salary = salary * exchangeRate;
 
-            if (isNetSalary)
-            {
-                double netSalary = netSalaryService.Calculate(salary);
+
+                double exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);
+                salary = salary * exchangeRate;
+
+                if (isNetSalary)
+                {
+                    double netSalary = netSalaryService.Calculate(salary);
+                    return Ok(new
+                    {
+                        Value = salary,
+                        NetSalary = netSalary,
+                        Currency = currency
+
+                    });
+                }
+
                 return Ok(new
                 {
                     Value = salary,
-                    Currency = currency,
-                    NetSalary = netSalary
+                    Currency = currency
                 });
             }
-
-            return Ok(new
+            catch (Exception ex)
             {
-                Value = salary,
-                Currency = currency
-            });
 
+                error.HandleError(ex.HResult);
+            }
         }
-
-
-
-        private IActionResult BadGateway()
-        {
-            return StatusCode(StatusCodes.Status502BadGateway);
-        }
-
     }
 }
+
 
 
