@@ -2,7 +2,6 @@
 using AccountingService.Controllers.models;
 using AccountingService.Data;
 using AccountingService.Services;
-using AccountingService.ErorHanding;
 
 namespace AccountingService.Controllers
 {
@@ -11,20 +10,13 @@ namespace AccountingService.Controllers
     public class UsersController : ControllerBase
     {
         private SalaryConversionContext salaryConversionContext;
-
         private ExchangeRateService exchangeRateService;
-
         private NetSalaryService netSalaryService;
-
-
-
         public UsersController(SalaryConversionContext context) : base()
         {
             salaryConversionContext = context;
             exchangeRateService = new ExchangeRateService();
             netSalaryService = new NetSalaryService();
-
-
         }
 
         [HttpGet]
@@ -39,9 +31,9 @@ namespace AccountingService.Controllers
                     Users = users,
                 });
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                Console.WriteLine("Error: " + ex.Message);
+               
                 return new StatusCodeResult(500);
             }
         }
@@ -56,9 +48,9 @@ namespace AccountingService.Controllers
 
                 return Ok(user);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                Console.WriteLine("Error: " + ex.Message);
+                
                 return new StatusCodeResult(500);
             }
         }
@@ -72,11 +64,9 @@ namespace AccountingService.Controllers
                 int changes = salaryConversionContext.SaveChanges();
                 return Ok();
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error: " + ex.Message);
+            catch (Exception )
+            {             
                 return new StatusCodeResult(500);
-
             }
         }
 
@@ -87,13 +77,11 @@ namespace AccountingService.Controllers
             {
                 salaryConversionContext.User.Update(request);
                 int changes = salaryConversionContext.SaveChanges();
-
                 return Ok();
             }
 
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error: " + ex.Message);
+            catch (Exception )
+            {          
                 return new StatusCodeResult(500);
             }
         }
@@ -105,7 +93,7 @@ namespace AccountingService.Controllers
                 try
                 {
                     var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
-                    if (user == null)
+                   if (user == null)
                     {
                         return NotFound();
                     }
@@ -115,9 +103,9 @@ namespace AccountingService.Controllers
 
                     return Ok();
                 }
-                catch (Exception ex)
+                catch (Exception )
                 {
-                    Console.WriteLine("Error: " + ex.Message);
+                   
                     return new StatusCodeResult(500);
                 }
             }
@@ -127,41 +115,44 @@ namespace AccountingService.Controllers
 
         public IActionResult GetUserSalary(int id, [FromQuery(Name = "currency")] string currency, [FromQuery(Name = "isNetSalary")] bool isNetSalary)
         {
+            double salary , exchangeRate;
             try
             {
-                double salary = salaryConversionContext.User
+                 salary = salaryConversionContext.User
                     .Where(u => u.ID == id)
                     .Select(u => u.Salary)
                     .SingleOrDefault();
-
-
-
-                double exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);
-                salary = salary * exchangeRate;
-
-                if (isNetSalary)
+                if(salary == 0)
                 {
-                    double netSalary = netSalaryService.Calculate(salary);
-                    return Ok(new
-                    {
-                        Value = salary,
-                        NetSalary = netSalary,
-                        Currency = currency
-
-                    });
+                    return NotFound();
                 }
+                 exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);
+                
+            }
+            catch (Exception )
+            {
+                
+                return new StatusCodeResult(500);
+            }
 
+            salary = salary * exchangeRate;
+            if (isNetSalary)
+            {
+                double netSalary = netSalaryService.Calculate(salary);
                 return Ok(new
                 {
                     Value = salary,
+                    NetSalary = netSalary,
                     Currency = currency
+
                 });
             }
-            catch (Exception ex)
+
+            return Ok(new
             {
-                Console.WriteLine("Error: " + ex.Message);
-                return new StatusCodeResult(500);
-            }
+                Value = salary,
+                Currency = currency
+            });
         }
     }
 }
