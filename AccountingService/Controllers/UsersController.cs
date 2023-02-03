@@ -16,14 +16,14 @@ namespace AccountingService.Controllers
 
         private NetSalaryService netSalaryService;
 
-        private Error error;
+
 
         public UsersController(SalaryConversionContext context) : base()
         {
             salaryConversionContext = context;
             exchangeRateService = new ExchangeRateService();
             netSalaryService = new NetSalaryService();
-            error = new Error();
+
 
         }
 
@@ -41,7 +41,8 @@ namespace AccountingService.Controllers
             }
             catch (Exception ex)
             {
-                error.HandleError(ex.HResult);
+                Console.WriteLine("Error: " + ex.Message);
+                return new StatusCodeResult(500);
             }
         }
 
@@ -57,7 +58,8 @@ namespace AccountingService.Controllers
             }
             catch (Exception ex)
             {
-                error.HandleError(ex.HResult);
+                Console.WriteLine("Error: " + ex.Message);
+                return new StatusCodeResult(500);
             }
         }
 
@@ -72,7 +74,9 @@ namespace AccountingService.Controllers
             }
             catch (Exception ex)
             {
-                error.HandleError(ex.HResult);
+                Console.WriteLine("Error: " + ex.Message);
+                return new StatusCodeResult(500);
+
             }
         }
 
@@ -89,7 +93,8 @@ namespace AccountingService.Controllers
 
             catch (Exception ex)
             {
-                error.HandleError(ex.HResult);
+                Console.WriteLine("Error: " + ex.Message);
+                return new StatusCodeResult(500);
             }
         }
 
@@ -112,7 +117,8 @@ namespace AccountingService.Controllers
                 }
                 catch (Exception ex)
                 {
-                    error.HandleError(ex.HResult);
+                    Console.WriteLine("Error: " + ex.Message);
+                    return new StatusCodeResult(500);
                 }
             }
         }
@@ -153,8 +159,8 @@ namespace AccountingService.Controllers
             }
             catch (Exception ex)
             {
-
-                error.HandleError(ex.HResult);
+                Console.WriteLine("Error: " + ex.Message);
+                return new StatusCodeResult(500);
             }
         }
     }
