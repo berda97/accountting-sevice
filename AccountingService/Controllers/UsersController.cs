@@ -33,8 +33,14 @@ namespace AccountingService.Controllers
             }
             catch (Exception )
             {
-               
-                return new StatusCodeResult(500);
+
+
+                var error = new Error
+                {
+                    Message = "Failed to Get_all_users",
+                    Code = Code.Unknown
+                };
+                return BadGateway(error);
             }
         }
 
@@ -50,8 +56,13 @@ namespace AccountingService.Controllers
             }
             catch (Exception )
             {
-                
-                return new StatusCodeResult(500);
+
+                var error = new Error
+                {
+                    Message = "Failed to Get_users_buyID",
+                    Code = Code.Unknown
+                };
+                return BadGateway(error);
             }
         }
 
@@ -65,8 +76,14 @@ namespace AccountingService.Controllers
                 return Ok();
             }
             catch (Exception )
-            {             
-                return new StatusCodeResult(500);
+            {
+
+                var error = new Error
+                {
+                    Message = "Failed to Create_user",
+                    Code = Code.Unknown
+                };
+                return BadGateway(error);
             }
         }
 
@@ -81,8 +98,14 @@ namespace AccountingService.Controllers
             }
 
             catch (Exception )
-            {          
-                return new StatusCodeResult(500);
+            {
+
+                var error = new Error
+                {
+                    Message = "Failed to Update_user",
+                    Code = Code.Unknown
+                };
+                return BadGateway(error);
             }
         }
 
@@ -105,10 +128,16 @@ namespace AccountingService.Controllers
                 }
                 catch (Exception )
                 {
-                   
-                    return new StatusCodeResult(500);
+
+                    var error = new Error
+                    {
+                        Message = "Failed to delete",
+                        Code = Code.Unknown
+                    };
+                    return BadGateway(error);
                 }
             }
+            
         }
 
         [HttpGet("{id}/salary")]
@@ -133,10 +162,12 @@ namespace AccountingService.Controllers
             catch (Exception )
             {
 
-                var error = new Error();
-
-                error.massege = "ovo je error";
-                return  StatusCode(500, error);
+                var error = new Error
+                {
+                    Message = "Failed to convert",
+                    Code = Code.Unknown
+                };               
+                return BadGateway(error);
             }
 
             salary = salary * exchangeRate;
@@ -159,6 +190,11 @@ namespace AccountingService.Controllers
             });
 
         }
+        private IActionResult BadGateway(Error error)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway,error);
+        }
+
     }
 }
 

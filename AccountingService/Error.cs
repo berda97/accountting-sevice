@@ -2,6 +2,14 @@
 {
     public class Error
     {
-        public string massege { get; set; }
+        public string Message { get; set; }
+        public Code Code { get; set; }
+
+    }
+    public enum Code
+    {
+        Unknown,
+        Validation,
+        
     }
 }
