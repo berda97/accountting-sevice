@@ -18,13 +18,13 @@ namespace AccountingService.Controllers
             exchangeRateService = new ExchangeRateService();
             netSalaryService = new NetSalaryService();
         }
-
         [HttpGet]
         public IActionResult GetAllUsers()
         {
             try
             {
                 var users = salaryConversionContext.User.ToArray(); // izvuci sve user iz tabele(user) 
+                
                 return Ok(new
                 {
                     Count = users.Length,
@@ -47,6 +47,10 @@ namespace AccountingService.Controllers
             try
             {
                 var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
+                if (user == null)
+                {
+                    return NotFound();
+                }
                 return Ok(user);
             }
             catch (Exception )
@@ -67,11 +71,14 @@ namespace AccountingService.Controllers
             {
                 salaryConversionContext.User.Add(request);
                 int changes = salaryConversionContext.SaveChanges();
+                if (changes == 0)
+                {
+                    return NotFound();
+                }
                 return Ok();
             }
             catch (Exception )
             {
-
                 var error = new Error
                 {
                     Message = "Failed to create",
@@ -88,12 +95,14 @@ namespace AccountingService.Controllers
             {
                 salaryConversionContext.User.Update(request);
                 int changes = salaryConversionContext.SaveChanges();
+                if (changes == 0)
+                {
+                    return NotFound();
+                }
                 return Ok();
             }
-
             catch (Exception )
             {
-
                 var error = new Error
                 {
                     Message = "Failed to update",
@@ -116,8 +125,6 @@ namespace AccountingService.Controllers
                     }
                     salaryConversionContext.User.Remove(user);
                     int changes = salaryConversionContext.SaveChanges();
-
-
                     return Ok();
                 }
                 catch (Exception )
