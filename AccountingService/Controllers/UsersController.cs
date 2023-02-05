@@ -129,10 +129,14 @@ namespace AccountingService.Controllers
                  exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);
                 
             }
+
             catch (Exception )
             {
-                
-                return new StatusCodeResult(500);
+
+                var error = new Error();
+
+                error.massege = "ovo je error";
+                return  StatusCode(500, error);
             }
 
             salary = salary * exchangeRate;
@@ -153,6 +157,7 @@ namespace AccountingService.Controllers
                 Value = salary,
                 Currency = currency
             });
+
         }
     }
 }
