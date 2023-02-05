@@ -33,25 +33,20 @@ namespace AccountingService.Controllers
             }
             catch (Exception )
             {
-
-
                 var error = new Error
                 {
-                    Message = "Failed to Get_all_users",
+                    Message = "Failed to get users",
                     Code = Code.Unknown
                 };
                 return BadGateway(error);
             }
         }
-
         [HttpGet("{id}")]
         public IActionResult GetUserById(int id)
         {
             try
             {
                 var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
-
-
                 return Ok(user);
             }
             catch (Exception )
@@ -59,13 +54,12 @@ namespace AccountingService.Controllers
 
                 var error = new Error
                 {
-                    Message = "Failed to Get_users_buyID",
+                    Message = "Failed to get user",
                     Code = Code.Unknown
                 };
                 return BadGateway(error);
             }
         }
-
         [HttpPost]
         public IActionResult CreateUser([FromBody] User request)
         {
@@ -80,7 +74,7 @@ namespace AccountingService.Controllers
 
                 var error = new Error
                 {
-                    Message = "Failed to Create_user",
+                    Message = "Failed to create",
                     Code = Code.Unknown
                 };
                 return BadGateway(error);
@@ -102,7 +96,7 @@ namespace AccountingService.Controllers
 
                 var error = new Error
                 {
-                    Message = "Failed to Update_user",
+                    Message = "Failed to update",
                     Code = Code.Unknown
                 };
                 return BadGateway(error);
@@ -128,7 +122,6 @@ namespace AccountingService.Controllers
                 }
                 catch (Exception )
                 {
-
                     var error = new Error
                     {
                         Message = "Failed to delete",
@@ -139,7 +132,6 @@ namespace AccountingService.Controllers
             }
             
         }
-
         [HttpGet("{id}/salary")]
 
         public IActionResult GetUserSalary(int id, [FromQuery(Name = "currency")] string currency, [FromQuery(Name = "isNetSalary")] bool isNetSalary)
@@ -158,10 +150,8 @@ namespace AccountingService.Controllers
                  exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);
                 
             }
-
             catch (Exception )
             {
-
                 var error = new Error
                 {
                     Message = "Failed to convert",
@@ -169,7 +159,6 @@ namespace AccountingService.Controllers
                 };               
                 return BadGateway(error);
             }
-
             salary = salary * exchangeRate;
             if (isNetSalary)
             {
@@ -179,16 +168,13 @@ namespace AccountingService.Controllers
                     Value = salary,
                     NetSalary = netSalary,
                     Currency = currency
-
                 });
             }
-
             return Ok(new
             {
                 Value = salary,
                 Currency = currency
             });
-
         }
         private IActionResult BadGateway(Error error)
         {
