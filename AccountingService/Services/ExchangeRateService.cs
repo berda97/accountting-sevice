@@ -2,7 +2,6 @@
 using RestSharp;
 
 namespace AccountingService.Services
-     
 {
     public class ExchangeRateService
     {
