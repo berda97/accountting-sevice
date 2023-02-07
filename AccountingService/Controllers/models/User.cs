@@ -7,8 +7,9 @@
         public string LastName { get; set; }
         public string Address { get; set; }
         public double Salary { get; set; }
-        public string Position { get; set; }
         public string Currency { get; set; }
+        public string Position { get; set; }
+       
 
     }
 }

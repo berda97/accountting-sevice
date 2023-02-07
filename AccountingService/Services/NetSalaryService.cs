@@ -11,7 +11,6 @@
             double socialSecurity = grossSalary * socialSecurityRate;
             double pension = grossSalary * pensionRate;
             double netoSalary = grossSalary - tax - socialSecurity - pension;
-
             return netoSalary;
         }
 

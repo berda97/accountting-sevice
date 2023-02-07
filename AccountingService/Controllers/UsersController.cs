@@ -10,11 +10,8 @@ namespace AccountingService.Controllers
     public class UsersController : ControllerBase
     {
         private SalaryConversionContext salaryConversionContext;
-
         private ExchangeRateService exchangeRateService;
-
         private NetSalaryService netSalaryService;
-
         public UsersController(SalaryConversionContext context) : base()
         {
             salaryConversionContext = context;
@@ -25,120 +22,188 @@ namespace AccountingService.Controllers
         [HttpGet]
         public IActionResult GetAllUsers()
         {
-            var users = salaryConversionContext.User.ToArray(); // izvuci sve user iz tabele(user) 
-            return Ok(new
+            try
             {
-                Count = users.Length,
-                Users = users,
-            });
+                var users = salaryConversionContext.User.ToArray(); // izvuci sve user iz tabele(user) 
 
+                return Ok(new
+                {
+                    Count = users.Length,
+                    Users = users,
+                });
+            }
+            catch (Exception)
+            {
+                var error = new Error
+                {
+                    Message = "An error occurred while trying to access user records",
+                    Code = Code.Unknown
+                };
+                return BadGateway(error);
+            }
         }
-
 
         [HttpGet("{id}")]
         public IActionResult GetUserById(int id)
         {
-            var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return Ok(user);
             }
-
-            return Ok(user);
-
+            catch (Exception )
+            {
+                var error = new Error
+                {
+                    Message = "Retrieving users failed",
+                    Code = Code.Unknown
+                };
+                return BadGateway(error);
+            }
         }
-
-
-
 
         [HttpPost]
         public IActionResult CreateUser([FromBody] User request)
         {
-            salaryConversionContext.User.Add(request);
-            int changes = salaryConversionContext.SaveChanges();
-            if (changes == 0)
+            try
             {
-                return BadGateway();
+                salaryConversionContext.User.Add(request);
+                int changes = salaryConversionContext.SaveChanges();
+                if (changes == 0)
+                {
+                    var fild_connection = new Error
+                    {
+                        Message = "change is unsuccessful",
+                        Code = Code.Connection
+                    };
+                    return BadGateway(fild_connection);
+                }
+                return Ok();
             }
-            return Ok();
+            catch (Exception )
+            {
+                var error = new Error
+                {
+                    Message = "Creation was unsuccessfu",
+                    Code = Code.Unknown
+                };
+                return BadGateway(error);
+            }
         }
 
         [HttpPut]
         public IActionResult UpdateUser([FromBody] User request)
         {
-            salaryConversionContext.User.Update(request);
-            int changes = salaryConversionContext.SaveChanges();
-            if (changes == 0)
+            try
             {
-                return BadGateway();
+                salaryConversionContext.User.Update(request);
+                int changes = salaryConversionContext.SaveChanges();
+                if (changes == 0)
+                {
+                    var updateFailed = new Error
+                    {
+                        Message = "Change is unsuccessful",
+                        Code = Code.Connection
+                    };
+                    return BadGateway(updateFailed);
+                }
+                return Ok();
             }
-
-            return Ok();
+            catch (Exception )
+            {
+                var error = new Error
+                {
+                    Message = "Update process was unsuccessful",
+                    Code = Code.Unknown
+                };
+                return BadGateway(error);
+            }
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteUser(int id)
         {
-            var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
-            if (user == null)
             {
-                return NotFound();
-            }
-            salaryConversionContext.User.Remove(user);
-            int changes = salaryConversionContext.SaveChanges();
-
-            if (changes == 0)
-            {
-                return BadGateway();
-            }
-            return Ok();
+                try
+                {
+                    var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
+                   if (user == null)
+                    {
+                        return NotFound();
+                    }
+                    salaryConversionContext.User.Remove(user);
+                    int changes = salaryConversionContext.SaveChanges();
+                    return Ok();
+                }
+                catch (Exception )
+                {
+                    var error = new Error
+                    {
+                        Message = "Deletion failed",
+                        Code = Code.Unknown
+                    };
+                    return BadGateway(error);
+                }
+            }           
         }
-
-
-
         [HttpGet("{id}/salary")]
+
         public IActionResult GetUserSalary(int id, [FromQuery(Name = "currency")] string currency, [FromQuery(Name = "isNetSalary")] bool isNetSalary)
         {
-            double salary = salaryConversionContext.User
-                .Where(u => u.ID == id)
-                .Select(u => u.Salary)
-                .SingleOrDefault();
-
-            if (salary == 0)
+            double salary , exchangeRate;
+            try
             {
-                return NotFound();
+                 salary = salaryConversionContext.User
+                    .Where(u => u.ID == id)
+                    .Select(u => u.Salary)
+                    .SingleOrDefault();
+                if(salary == 0)
+                {
+                    var updateFailed = new Error
+                    {
+                        Message = "change is unsuccessful",
+                        Code = Code.Connection
+                    };
+                    return BadGateway(updateFailed);
+                }
+                 exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);              
             }
-
-            double exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);
+            catch (Exception )
+            {
+                var error = new Error
+                {
+                    Message = "Unable to perform conversion",
+                    Code = Code.Unknown
+                };               
+                return BadGateway(error);
+            }
             salary = salary * exchangeRate;
-
             if (isNetSalary)
             {
                 double netSalary = netSalaryService.Calculate(salary);
                 return Ok(new
                 {
                     Value = salary,
-                    Currency = currency,
-                    NetSalary = netSalary
+                    NetSalary = netSalary,
+                    Currency = currency
                 });
             }
-
             return Ok(new
             {
                 Value = salary,
                 Currency = currency
             });
-
         }
-
-
-
-        private IActionResult BadGateway()
+        private IActionResult BadGateway(Error error)
         {
-            return StatusCode(StatusCodes.Status502BadGateway);
+            return StatusCode(StatusCodes.Status502BadGateway,error);
         }
-
     }
 }
+
 
 
