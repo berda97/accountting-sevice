@@ -11,12 +11,12 @@ namespace AccountingService.Services
         private static readonly TimeSpan UpdateInterval = TimeSpan.FromDays(1);
         public double GetCurrencyExchangeRate(string currency)
         {
-            if (currency == null )
+            if (currency == null) 
             {
                 return 1;
             }
             ReloadExchangeRates();
-            return _exchangeRates[currency].Value<double>();       
+            return _exchangeRates[currency].Value<double>();
         }
         private static void ReloadExchangeRates()
         {
@@ -27,7 +27,8 @@ namespace AccountingService.Services
             var client = new RestClient("https://api.apilayer.com/fixer/latest");
             var request = new RestRequest();
             request.Method = Method.Get;
-            request.AddHeader("apikey", "6IRdNpTdHNvBw5bd4ouVVoAgo5WpZA2");
+            request.AddHeader("apikey", "[API-KEY]");
+
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
             var obj = JObject.Parse(response.Content);

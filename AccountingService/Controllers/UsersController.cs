@@ -25,41 +25,47 @@ namespace AccountingService.Controllers
             try
             {
                 var users = salaryConversionContext.User.ToArray(); // izvuci sve user iz tabele(user) 
+
                 return Ok(new
                 {
                     Count = users.Length,
                     Users = users,
                 });
             }
-            catch (Exception )
+            catch (Exception)
             {
                 var error = new Error
                 {
-                    Message = "Failed to get users",
+                    Message = "An error occurred while trying to access user records",
                     Code = Code.Unknown
                 };
                 return BadGateway(error);
             }
         }
+
         [HttpGet("{id}")]
         public IActionResult GetUserById(int id)
         {
             try
             {
                 var user = salaryConversionContext.User.Where(u => u.ID == id).SingleOrDefault();
+                if (user == null)
+                {
+                    return NotFound();
+                }
                 return Ok(user);
             }
             catch (Exception )
             {
-
                 var error = new Error
                 {
-                    Message = "Failed to get user",
+                    Message = "Retrieving users failed",
                     Code = Code.Unknown
                 };
                 return BadGateway(error);
             }
         }
+
         [HttpPost]
         public IActionResult CreateUser([FromBody] User request)
         {
@@ -67,14 +73,22 @@ namespace AccountingService.Controllers
             {
                 salaryConversionContext.User.Add(request);
                 int changes = salaryConversionContext.SaveChanges();
+                if (changes == 0)
+                {
+                    var fild_connection = new Error
+                    {
+                        Message = "change is unsuccessful",
+                        Code = Code.Connection
+                    };
+                    return BadGateway(fild_connection);
+                }
                 return Ok();
             }
             catch (Exception )
             {
-
                 var error = new Error
                 {
-                    Message = "Failed to create",
+                    Message = "Creation was unsuccessfu",
                     Code = Code.Unknown
                 };
                 return BadGateway(error);
@@ -88,15 +102,22 @@ namespace AccountingService.Controllers
             {
                 salaryConversionContext.User.Update(request);
                 int changes = salaryConversionContext.SaveChanges();
+                if (changes == 0)
+                {
+                    var updateFailed = new Error
+                    {
+                        Message = "Change is unsuccessful",
+                        Code = Code.Connection
+                    };
+                    return BadGateway(updateFailed);
+                }
                 return Ok();
             }
-
             catch (Exception )
             {
-
                 var error = new Error
                 {
-                    Message = "Failed to update",
+                    Message = "Update process was unsuccessful",
                     Code = Code.Unknown
                 };
                 return BadGateway(error);
@@ -116,21 +137,18 @@ namespace AccountingService.Controllers
                     }
                     salaryConversionContext.User.Remove(user);
                     int changes = salaryConversionContext.SaveChanges();
-
-
                     return Ok();
                 }
                 catch (Exception )
                 {
                     var error = new Error
                     {
-                        Message = "Failed to delete",
+                        Message = "Deletion failed",
                         Code = Code.Unknown
                     };
                     return BadGateway(error);
                 }
-            }
-            
+            }           
         }
         [HttpGet("{id}/salary")]
 
@@ -145,16 +163,20 @@ namespace AccountingService.Controllers
                     .SingleOrDefault();
                 if(salary == 0)
                 {
-                    return NotFound();
+                    var updateFailed = new Error
+                    {
+                        Message = "change is unsuccessful",
+                        Code = Code.Connection
+                    };
+                    return BadGateway(updateFailed);
                 }
-                 exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);
-                
+                 exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);              
             }
             catch (Exception )
             {
                 var error = new Error
                 {
-                    Message = "Failed to convert",
+                    Message = "Unable to perform conversion",
                     Code = Code.Unknown
                 };               
                 return BadGateway(error);
@@ -180,7 +202,6 @@ namespace AccountingService.Controllers
         {
             return StatusCode(StatusCodes.Status502BadGateway,error);
         }
-
     }
 }
 
