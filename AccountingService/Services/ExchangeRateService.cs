@@ -6,8 +6,7 @@ namespace AccountingService.Services
     public class ExchangeRateService
     {
         private static JToken _exchangeRates;
-        private static DateTime _lastUpdate;
-        private static readonly TimeSpan UpdateInterval = TimeSpan.FromDays(1);
+       
         public double GetCurrencyExchangeRate(string currency)
         {
             if (currency == null) 
@@ -19,7 +18,7 @@ namespace AccountingService.Services
         }
         private static void ReloadExchangeRates()
         {
-            if(_exchangeRates != null && (DateTime.Now - _lastUpdate) < UpdateInterval)
+            if(_exchangeRates != null )
             {
                 return;
             }
@@ -34,7 +33,7 @@ namespace AccountingService.Services
 
             var obj = JObject.Parse(response.Content);
             _exchangeRates = obj["rates"];
-            _lastUpdate=DateTime.Now;
+           
            
         }
     }
