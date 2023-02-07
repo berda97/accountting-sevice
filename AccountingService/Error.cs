@@ -8,6 +8,7 @@
     public enum Code
     {
         Unknown,
-        Validation,      
+        Validation,
+        Connection,
     }
 }

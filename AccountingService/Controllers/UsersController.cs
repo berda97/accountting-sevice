@@ -57,7 +57,6 @@ namespace AccountingService.Controllers
             }
             catch (Exception )
             {
-
                 var error = new Error
                 {
                     Message = "Retrieving users failed",
@@ -79,7 +78,7 @@ namespace AccountingService.Controllers
                     var fild_connection = new Error
                     {
                         Message = "change is unsuccessful",
-                        Code = Code.Unknown
+                        Code = Code.Connection
                     };
                     return BadGateway(fild_connection);
                 }
@@ -103,15 +102,14 @@ namespace AccountingService.Controllers
             {
                 salaryConversionContext.User.Update(request);
                 int changes = salaryConversionContext.SaveChanges();
-
                 if (changes == 0)
                 {
-                    var fild_connection = new Error
+                    var updateFailed = new Error
                     {
-                        Message = "change is unsuccessful",
-                        Code = Code.Unknown
+                        Message = "Change is unsuccessful",
+                        Code = Code.Connection
                     };
-                    return BadGateway(fild_connection);
+                    return BadGateway(updateFailed);
                 }
                 return Ok();
             }
@@ -165,12 +163,12 @@ namespace AccountingService.Controllers
                     .SingleOrDefault();
                 if(salary == 0)
                 {
-                    var fild_connection = new Error
+                    var updateFailed = new Error
                     {
                         Message = "change is unsuccessful",
-                        Code = Code.Unknown
+                        Code = Code.Connection
                     };
-                    return BadGateway(fild_connection);
+                    return BadGateway(updateFailed);
                 }
                  exchangeRate = exchangeRateService.GetCurrencyExchangeRate(currency);              
             }
