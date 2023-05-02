@@ -5,8 +5,21 @@ using AccountingService.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+ 
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    
+    options.AddPolicy(name: "CorsOriginPolicy",
+                      builder =>
+                      {
+                          builder.WithOrigins("https://localhost:4200", "http://localhost:4200");
+                          
+                           
+
+                      });
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -32,4 +45,17 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseCors();
+
 app.Run();
+
+app.UseAuthentication();
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    });
+
+
+
+

@@ -2,16 +2,21 @@
 using AccountingService.Controllers.models;
 using AccountingService.Data;
 using AccountingService.Services;
+using Microsoft.AspNetCore.Cors;
+using System.Security.Cryptography;
 
 namespace AccountingService.Controllers
 {
+    [EnableCors("CorsOriginPolicy")]
     [Route("api/users")]
     [ApiController]
+    
     public class UsersController : ControllerBase
     {
         private SalaryConversionContext salaryConversionContext;
         private ExchangeRateService exchangeRateService;
         private NetSalaryService netSalaryService;
+        
         public UsersController(SalaryConversionContext context) : base()
         {
             salaryConversionContext = context;
@@ -19,7 +24,9 @@ namespace AccountingService.Controllers
             netSalaryService = new NetSalaryService();
         }
 
+        
         [HttpGet]
+        
         public IActionResult GetAllUsers()
         {
             try
@@ -65,7 +72,7 @@ namespace AccountingService.Controllers
                 return BadGateway(error);
             }
         }
-
+        
         [HttpPost]
         public IActionResult CreateUser([FromBody] User request)
         {
@@ -151,7 +158,6 @@ namespace AccountingService.Controllers
             }           
         }
         [HttpGet("{id}/salary")]
-
         public IActionResult GetUserSalary(int id, [FromQuery(Name = "currency")] string currency, [FromQuery(Name = "isNetSalary")] bool isNetSalary)
         {
             double salary , exchangeRate;
@@ -198,10 +204,12 @@ namespace AccountingService.Controllers
                 Currency = currency
             });
         }
+
         private IActionResult BadGateway(Error error)
         {
             return StatusCode(StatusCodes.Status502BadGateway,error);
         }
+        
     }
 }
 

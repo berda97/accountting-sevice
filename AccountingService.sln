@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountingService", "AccountingService\AccountingService.csproj", "{054096FC-7E07-46C9-B75F-7A2EE1230DDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountingService", "AccountingService\AccountingService.csproj", "{054096FC-7E07-46C9-B75F-7A2EE1230DDB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{88F7BB93-3324-455A-8232-904F90C6FBD3}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
