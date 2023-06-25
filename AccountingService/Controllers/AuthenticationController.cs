@@ -21,43 +21,47 @@ namespace AccountingService.Controllers
             salaryConversionContext = context;
         }
             [HttpPost("register")]
-        public async Task<ActionResult<SystemUser>> Register(Authentication requst)
+        public async Task<ActionResult<SystemUser>> Register(Authentication request)
         {
-            CreatePasswordHash(requst.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
             var user = new SystemUser();
+
             try
             {
-                
+                const string PasswordRegexPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$";
                 var useremail= salaryConversionContext.SystemUser.
-                    Where(u => u.Email == requst.Email).SingleOrDefault();
+                    Where(u => u.Email == request.Email).SingleOrDefault();
                 if (useremail != null)
                 {
                     return BadRequest("Email already exists.");
                 }
 
-                if (!Regex.IsMatch(requst.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$"))
+                if (!Regex.IsMatch(request.Password, PasswordRegexPattern))
                 {
-                    return BadRequest("Password mora da sadrži najmanje 8 karaktera, mala i velika slova, brojeve i specijalne znakove.");
+                    return BadRequest("Password must contain at least 8 characters, lowercase and uppercase letters, numbers, and special characters.");
                 }
-                user.Email = requst.Email;
+                user.Email = request.Email;
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
                 
-                    salaryConversionContext.SystemUser.Add(user);
-                    await salaryConversionContext.SaveChangesAsync();
+                salaryConversionContext.SystemUser.Add(user);
+                await salaryConversionContext.SaveChangesAsync();
 
                 return Ok(user);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                Console.WriteLine(" Došlo je do greške pri registraciji: " + ex.Message);
-                return StatusCode(500, "Došlo je do greške pri registraciji.");
+                var error = new Error
+                {
+                    Message= "An error occurred during the registration process",
+                    Code=Code.Connection
+                };
+                return BadRequest(error);
             }
         }
         [HttpPost("login")]
         public async Task<ActionResult<SystemUser>> Login(Authentication req)
         {
-            
             var userlogin = new SystemUser();
             try
             {
@@ -65,20 +69,34 @@ namespace AccountingService.Controllers
                     FirstOrDefaultAsync(u => u.Email == req.Email);
                 if (userdata == null )
                 {
-                    return BadRequest("Pogrešan email.");
+                    var emailFailed = new Error
+                    {
+                        Message = "Wrong email",
+                        Code = Code.Unknown
+                    };
+                    return BadRequest(emailFailed);
                 }         
                 var verifypassword = VerifyPasswordHash(req.Password, userdata.PasswordHash, userdata.PasswordSalt);
                 if (verifypassword)
                 {
-                    return Ok("uspesno ste se logovali");
+                    return Ok("You have been successfully logged in");
                 }
+                var error = new Error
+                {
+                    Message = "You have not been successfully logged in",
+                    Code = Code.Connection
+                };
+                return BadRequest(error);
 
-                return BadRequest("Pogresan password");
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                Console.WriteLine(" Došlo je do greške pri prijavljivanju: " + ex.Message);
-                return BadRequest("Došlo je do greške pri prijavljivanju.");
+                var error = new Error
+                {
+                    Message= "An error occurred during the login process",
+                    Code=Code.Connection
+                };
+                return BadRequest(error);
             }
         }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
@@ -96,6 +114,10 @@ namespace AccountingService.Controllers
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
+        }
+        private IActionResult BadGateway(Error error)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway, error);
         }
     }
 }
