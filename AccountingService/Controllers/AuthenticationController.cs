@@ -25,7 +25,6 @@ namespace AccountingService.Controllers
         {
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
             var user = new SystemUser();
-
             try
             {
                 const string PasswordRegexPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$";
@@ -83,11 +82,10 @@ namespace AccountingService.Controllers
                 }
                 var error = new Error
                 {
-                    Message = "You have not been successfully logged in",
-                    Code = Code.Connection
+                    Message = "Your Incorrect password",
+                    Code = (Code)PasswordIncorrect.PasswordIncorrect
                 };
                 return BadRequest(error);
-
             }
             catch (Exception )
             {
@@ -118,6 +116,10 @@ namespace AccountingService.Controllers
         private IActionResult BadGateway(Error error)
         {
             return StatusCode(StatusCodes.Status502BadGateway, error);
+        }
+        enum PasswordIncorrect
+        {
+            PasswordIncorrect = 1002,
         }
     }
 }

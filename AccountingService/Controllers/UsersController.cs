@@ -9,14 +9,12 @@ namespace AccountingService.Controllers
 {
     [EnableCors("CorsOriginPolicy")]
     [Route("api/users")]
-    [ApiController]
-    
+    [ApiController] 
     public class UsersController : ControllerBase
     {
         private SalaryConversionContext salaryConversionContext;
         private ExchangeRateService exchangeRateService;
         private NetSalaryService netSalaryService;
-        
         public UsersController(SalaryConversionContext context) : base()
         {
             salaryConversionContext = context;
@@ -24,7 +22,6 @@ namespace AccountingService.Controllers
             netSalaryService = new NetSalaryService();
         }
 
-        
         [HttpGet]
         
         public IActionResult GetAllUsers()
@@ -72,7 +69,7 @@ namespace AccountingService.Controllers
                 return BadGateway(error);
             }
         }
-        
+
         [HttpPost]
         public IActionResult CreateUser([FromBody] User request)
         {
@@ -101,7 +98,6 @@ namespace AccountingService.Controllers
                 return BadGateway(error);
             }
         }
-
         [HttpPut]
         public IActionResult UpdateUser([FromBody] User request)
         {
@@ -130,7 +126,6 @@ namespace AccountingService.Controllers
                 return BadGateway(error);
             }
         }
-
         [HttpDelete("{id}")]
         public IActionResult DeleteUser(int id)
         {
