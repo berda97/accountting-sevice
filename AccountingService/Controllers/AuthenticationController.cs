@@ -82,8 +82,8 @@ namespace AccountingService.Controllers
                 }
                 var error = new Error
                 {
-                    Message = "Your Incorrect password",
-                    Code = (Code)PasswordIncorrect.PasswordIncorrect
+                    Message = "Your password is incorrect ",
+                    Code = Code.PasswordIncorrect
                 };
                 return BadRequest(error);
             }
@@ -117,9 +117,6 @@ namespace AccountingService.Controllers
         {
             return StatusCode(StatusCodes.Status502BadGateway, error);
         }
-        enum PasswordIncorrect
-        {
-            PasswordIncorrect = 1002,
-        }
+       
     }
 }
