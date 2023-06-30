@@ -10,6 +10,5 @@
         public string Currency { get; set; }
         public string Position { get; set; }
        
-
     }
 }

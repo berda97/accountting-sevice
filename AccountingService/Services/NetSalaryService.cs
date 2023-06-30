@@ -13,8 +13,6 @@
             double netoSalary = grossSalary - tax - socialSecurity - pension;
             return netoSalary;
         }
-
-        
     }
 }
 

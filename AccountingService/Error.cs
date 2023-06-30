@@ -4,11 +4,13 @@
     {
         public string Message { get; set; }
         public Code Code { get; set; }
+
     }
     public enum Code
     {
         Unknown,
         Validation,
         Connection,
+        PasswordIncorrect = 1002,
     }
 }
