@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 using BC = BCrypt.Net.BCrypt;
 using System.Text.RegularExpressions;
+using AccountingService.Services;
 
 namespace AccountingService.Controllers
 {
@@ -16,9 +17,14 @@ namespace AccountingService.Controllers
     public class AuthenticationController : ControllerBase
     {
         private SalaryConversionContext salaryConversionContext;
+        private JwtTokenService jwtTokenSevice;
+        private ClaimsService claimsSevice;
+
         public AuthenticationController(SalaryConversionContext context) : base()
         {
             salaryConversionContext = context;
+            jwtTokenSevice = new JwtTokenService();
+            claimsSevice = new ClaimsService();
         }
             [HttpPost("register")]
         public async Task<ActionResult<SystemUser>> Register(Authentication request)
@@ -75,11 +81,16 @@ namespace AccountingService.Controllers
                     };
                     return BadRequest(emailFailed);
                 }         
+
                 var verifypassword = VerifyPasswordHash(req.Password, userdata.PasswordHash, userdata.PasswordSalt);
                 if (verifypassword)
                 {
-                    return Ok("You have been successfully logged in");
+                    var claims = claimsSevice.GetUserClaims(userdata);
+                    var generateJwt = jwtTokenSevice.GetToken(claims);
+                    return Ok(generateJwt);
+                   
                 }
+
                 var error = new Error
                 {
                     Message = "Your password is incorrect ",
@@ -96,6 +107,7 @@ namespace AccountingService.Controllers
                 };
                 return BadRequest(error);
             }
+
         }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
