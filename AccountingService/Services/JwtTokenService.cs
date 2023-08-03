@@ -24,7 +24,8 @@ namespace AccountingService.Services
             return new Token
             {
                 Value = new JwtSecurityTokenHandler().WriteToken(token),
-                ValidTo = token.ValidTo
+                ValidTo = token.ValidTo,
+                
             };
         }
     }

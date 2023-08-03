@@ -7,9 +7,10 @@ namespace AccountingService.Services
     {
         public List<Claim> GetUserClaims(SystemUser systemUser)
         {
-            var claims =  new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Email, systemUser.Email));
+            var claims = new List<Claim>();
+            claims.Add(new Claim("Email", systemUser.Email));
             return claims;
+            
         }
     }
 }

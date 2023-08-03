@@ -8,12 +8,13 @@ using System.Security.Cryptography;
 using BC = BCrypt.Net.BCrypt;
 using System.Text.RegularExpressions;
 using AccountingService.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AccountingService.Controllers
 {
-    [EnableCors("CorsOriginPolicy")]
     [Route("api/authentication")]
     [ApiController]
+    
     public class AuthenticationController : ControllerBase
     {
         private SalaryConversionContext salaryConversionContext;
@@ -64,6 +65,7 @@ namespace AccountingService.Controllers
                 return BadRequest(error);
             }
         }
+
         [HttpPost("login")]
         public async Task<ActionResult<SystemUser>> Login(Authentication req)
         {
@@ -72,6 +74,7 @@ namespace AccountingService.Controllers
             {
                 var userdata = await salaryConversionContext.SystemUser.
                     FirstOrDefaultAsync(u => u.Email == req.Email);
+                
                 if (userdata == null )
                 {
                     var emailFailed = new Error
