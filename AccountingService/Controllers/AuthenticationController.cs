@@ -9,25 +9,34 @@ using BC = BCrypt.Net.BCrypt;
 using System.Text.RegularExpressions;
 using AccountingService.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace AccountingService.Controllers
 {
     [Route("api/authentication")]
     [ApiController]
-    
+
     public class AuthenticationController : ControllerBase
     {
         private SalaryConversionContext salaryConversionContext;
         private JwtTokenService jwtTokenSevice;
         private ClaimsService claimsSevice;
+        private IConfiguration configuration;
 
-        public AuthenticationController(SalaryConversionContext context) : base()
+
+        public AuthenticationController(SalaryConversionContext context, IConfiguration _configuration) : base()
         {
+
+            configuration = _configuration;
             salaryConversionContext = context;
-            jwtTokenSevice = new JwtTokenService();
+            jwtTokenSevice = new JwtTokenService(configuration);
             claimsSevice = new ClaimsService();
+
+
+
         }
-            [HttpPost("register")]
+        [HttpPost("register")]
         public async Task<ActionResult<SystemUser>> Register(Authentication request)
         {
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -35,7 +44,7 @@ namespace AccountingService.Controllers
             try
             {
                 const string PasswordRegexPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$";
-                var useremail= salaryConversionContext.SystemUser.
+                var useremail = salaryConversionContext.SystemUser.
                     Where(u => u.Email == request.Email).SingleOrDefault();
                 if (useremail != null)
                 {
@@ -49,18 +58,18 @@ namespace AccountingService.Controllers
                 user.Email = request.Email;
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
-                
+
                 salaryConversionContext.SystemUser.Add(user);
                 await salaryConversionContext.SaveChangesAsync();
 
                 return Ok(user);
             }
-            catch (Exception )
+            catch (Exception)
             {
                 var error = new Error
                 {
-                    Message= "An error occurred during the registration process",
-                    Code=Code.Connection
+                    Message = "An error occurred during the registration process",
+                    Code = Code.Connection
                 };
                 return BadRequest(error);
             }
@@ -74,8 +83,8 @@ namespace AccountingService.Controllers
             {
                 var userdata = await salaryConversionContext.SystemUser.
                     FirstOrDefaultAsync(u => u.Email == req.Email);
-                
-                if (userdata == null )
+
+                if (userdata == null)
                 {
                     var emailFailed = new Error
                     {
@@ -83,7 +92,7 @@ namespace AccountingService.Controllers
                         Code = Code.Unknown
                     };
                     return BadRequest(emailFailed);
-                }         
+                }
 
                 var verifypassword = VerifyPasswordHash(req.Password, userdata.PasswordHash, userdata.PasswordSalt);
                 if (verifypassword)
@@ -91,7 +100,7 @@ namespace AccountingService.Controllers
                     var claims = claimsSevice.GetUserClaims(userdata);
                     var generateJwt = jwtTokenSevice.GetToken(claims);
                     return Ok(generateJwt);
-                   
+
                 }
 
                 var error = new Error
@@ -101,12 +110,12 @@ namespace AccountingService.Controllers
                 };
                 return BadRequest(error);
             }
-            catch (Exception )
+            catch (Exception)
             {
                 var error = new Error
                 {
-                    Message= "An error occurred during the login process",
-                    Code=Code.Connection
+                    Message = "An error occurred during the login process",
+                    Code = Code.Connection
                 };
                 return BadRequest(error);
             }
@@ -132,6 +141,6 @@ namespace AccountingService.Controllers
         {
             return StatusCode(StatusCodes.Status502BadGateway, error);
         }
-       
+
     }
 }

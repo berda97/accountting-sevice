@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+ 
 
 
 builder.Services.AddAuthentication(x =>
@@ -26,15 +27,15 @@ builder.Services.AddAuthentication(x =>
             return context.Response.WriteAsync("Neautoriziran pristup"); 
         }
     };
-    var Key = Encoding.UTF8.GetBytes("Jwt:key");
+    var Key = Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Key"]);
     o.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "Jwt:Issuer",
-        ValidAudience = "Jwt:Audience",
+        ValidIssuer = builder.Configuration["JwtConfig:Issuer"],
+        ValidAudience = builder.Configuration["JwtConfig:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Key)
     };
 });
