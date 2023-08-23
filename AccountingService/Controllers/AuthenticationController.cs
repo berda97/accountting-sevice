@@ -14,27 +14,22 @@ using Microsoft.Extensions.Configuration;
 
 namespace AccountingService.Controllers
 {
+    
     [Route("api/authentication")]
     [ApiController]
-
     public class AuthenticationController : ControllerBase
     {
         private SalaryConversionContext salaryConversionContext;
         private JwtTokenService jwtTokenSevice;
         private ClaimsService claimsSevice;
         private IConfiguration configuration;
-
-
-        public AuthenticationController(SalaryConversionContext context, IConfiguration _configuration) : base()
+        public AuthenticationController(SalaryConversionContext context, IConfiguration config) : base()
         {
 
-            configuration = _configuration;
+            configuration = config;
             salaryConversionContext = context;
             jwtTokenSevice = new JwtTokenService(configuration);
             claimsSevice = new ClaimsService();
-
-
-
         }
         [HttpPost("register")]
         public async Task<ActionResult<SystemUser>> Register(Authentication request)

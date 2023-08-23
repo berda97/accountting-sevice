@@ -11,20 +11,14 @@ namespace AccountingService.Services
 {
     public class JwtTokenService
     {
-
-
         private readonly IConfiguration _configuration;
 
         public JwtTokenService(IConfiguration configuration)
         {
             _configuration = configuration;
         }
-
-
         public Token GetToken(List<Claim> claims)
         {
-
-
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));
 
             var expiryInMinutes = Convert.ToInt32(15);
@@ -38,7 +32,6 @@ namespace AccountingService.Services
                 expires: DateTime.Now.AddMinutes(expiryInMinutes),
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
-
             return new Token
             {
                 Value = new JwtSecurityTokenHandler().WriteToken(token),

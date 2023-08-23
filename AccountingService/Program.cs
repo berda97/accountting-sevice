@@ -9,8 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
  
-
-
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -18,15 +16,7 @@ builder.Services.AddAuthentication(x =>
 
 }).AddJwtBearer(o =>
 {
-    o.Events = new JwtBearerEvents
-    {
-        OnAuthenticationFailed = context =>
-        {
-            context.Response.StatusCode = 401; 
-            context.Response.ContentType = "text/plain";
-            return context.Response.WriteAsync("Neautoriziran pristup"); 
-        }
-    };
+    
     var Key = Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Key"]);
     o.TokenValidationParameters = new TokenValidationParameters
     {
@@ -39,19 +29,17 @@ builder.Services.AddAuthentication(x =>
         IssuerSigningKey = new SymmetricSecurityKey(Key)
     };
 });
-builder.Services.AddMvc();
-builder.Services.AddRazorPages();
-builder.Services.AddControllers();
 
+builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    // Dodajte Swagger definiciju
+    // Add a Swagger definition
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "v1" });
 
-    // Dodajte JWT token shemu
+    // Add a JWT token scheme
     var securityScheme = new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -62,7 +50,7 @@ builder.Services.AddSwaggerGen(c =>
     };
     c.AddSecurityDefinition("Bearer", securityScheme);
 
-    // Definirajte zahtjev za JWT token
+    // Define a request for a JWT token
     var securityRequirement = new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
@@ -110,7 +98,6 @@ app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
-    endpoints.MapRazorPages();
 });
 
 app.Run();

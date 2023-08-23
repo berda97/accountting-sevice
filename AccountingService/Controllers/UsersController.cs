@@ -10,9 +10,7 @@ namespace AccountingService.Controllers
 {
     [Route("api/users")]
     [ApiController]
-
-    
-
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private SalaryConversionContext salaryConversionContext;
@@ -25,8 +23,7 @@ namespace AccountingService.Controllers
             netSalaryService = new NetSalaryService();
         }
 
-        [HttpGet]
-        [Authorize]
+        [HttpGet]  
         public IActionResult GetAllUsers()
         {
             try
