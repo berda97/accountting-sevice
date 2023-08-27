@@ -14,7 +14,6 @@ using Microsoft.Extensions.Configuration;
 namespace AccountingService.Controllers
 {
     [Route("api/authentication")]
-   // [EnableCors("CorsOriginPolicy")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
