@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
-using BC = BCrypt.Net.BCrypt;
 using System.Text.RegularExpressions;
 using AccountingService.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +13,6 @@ using Microsoft.Extensions.Configuration;
 
 namespace AccountingService.Controllers
 {
-    
     [Route("api/authentication")]
     [ApiController]
     public class AuthenticationController : ControllerBase
@@ -25,7 +23,6 @@ namespace AccountingService.Controllers
         private IConfiguration configuration;
         public AuthenticationController(SalaryConversionContext context, IConfiguration config) : base()
         {
-
             configuration = config;
             salaryConversionContext = context;
             jwtTokenSevice = new JwtTokenService(configuration);
@@ -53,10 +50,8 @@ namespace AccountingService.Controllers
                 user.Email = request.Email;
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
-
                 salaryConversionContext.SystemUser.Add(user);
                 await salaryConversionContext.SaveChangesAsync();
-
                 return Ok(user);
             }
             catch (Exception)
@@ -69,7 +64,6 @@ namespace AccountingService.Controllers
                 return BadRequest(error);
             }
         }
-
         [HttpPost("login")]
         public async Task<ActionResult<SystemUser>> Login(Authentication req)
         {
@@ -88,16 +82,13 @@ namespace AccountingService.Controllers
                     };
                     return BadRequest(emailFailed);
                 }
-
                 var verifypassword = VerifyPasswordHash(req.Password, userdata.PasswordHash, userdata.PasswordSalt);
                 if (verifypassword)
                 {
                     var claims = claimsSevice.GetUserClaims(userdata);
                     var generateJwt = jwtTokenSevice.GetToken(claims);
                     return Ok(generateJwt);
-
                 }
-
                 var error = new Error
                 {
                     Message = "Your password is incorrect ",
@@ -114,7 +105,6 @@ namespace AccountingService.Controllers
                 };
                 return BadRequest(error);
             }
-
         }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
@@ -136,6 +126,5 @@ namespace AccountingService.Controllers
         {
             return StatusCode(StatusCodes.Status502BadGateway, error);
         }
-
     }
 }

@@ -199,7 +199,6 @@ namespace AccountingService.Controllers
                 Currency = currency
             });
         }
-
         private IActionResult BadGateway(Error error)
         {
             return StatusCode(StatusCodes.Status502BadGateway,error);

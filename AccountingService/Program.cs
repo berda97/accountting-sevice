@@ -8,7 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
- 
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -16,7 +15,6 @@ builder.Services.AddAuthentication(x =>
 
 }).AddJwtBearer(o =>
 {
-    
     var Key = Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Key"]);
     o.TokenValidationParameters = new TokenValidationParameters
     {
@@ -31,9 +29,9 @@ builder.Services.AddAuthentication(x =>
 });
 
 builder.Services.AddControllers();
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     // Add a Swagger definition
@@ -48,8 +46,8 @@ builder.Services.AddSwaggerGen(c =>
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     };
-    c.AddSecurityDefinition("Bearer", securityScheme);
 
+    c.AddSecurityDefinition("Bearer", securityScheme);
     // Define a request for a JWT token
     var securityRequirement = new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
@@ -68,33 +66,29 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityRequirement(securityRequirement);
 });
 
+var conn = builder.Configuration.GetConnectionString("SalaryConversionContext");
 builder.Services.AddDbContext<SalaryConversionContext>(opt => {
-    var conn = "Server=localhost;Database=salaryconversion;Uid=root;Pwd=root;";
     opt.UseMySql(conn, ServerVersion.AutoDetect(conn));
 });
 
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-        // Dodajte ovu liniju kako biste uključili "Authorize" gumb u Swagger UI
+        // Add this line to include the "Authorize" button in the Swagger UI
         c.OAuthClientId("swagger");
         c.OAuthAppName("My Swagger UI");
     });
 }
-
 app.UseHttpsRedirection();
 app.MapControllers();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();

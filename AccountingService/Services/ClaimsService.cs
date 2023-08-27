@@ -10,7 +10,6 @@ namespace AccountingService.Services
             var claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.Email, systemUser.Email));
             return claims;
-            
         }
     }
 }
