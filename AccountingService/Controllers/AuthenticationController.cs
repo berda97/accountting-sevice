@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 namespace AccountingService.Controllers
 {
     [Route("api/authentication")]
+   // [EnableCors("CorsOriginPolicy")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
@@ -28,6 +29,7 @@ namespace AccountingService.Controllers
             jwtTokenSevice = new JwtTokenService(configuration);
             claimsSevice = new ClaimsService();
         }
+
         [HttpPost("register")]
         public async Task<ActionResult<SystemUser>> Register(Authentication request)
         {
@@ -47,6 +49,7 @@ namespace AccountingService.Controllers
                 {
                     return BadRequest("Password must contain at least 8 characters, lowercase and uppercase letters, numbers, and special characters.");
                 }
+
                 user.Email = request.Email;
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
@@ -64,6 +67,7 @@ namespace AccountingService.Controllers
                 return BadRequest(error);
             }
         }
+
         [HttpPost("login")]
         public async Task<ActionResult<SystemUser>> Login(Authentication req)
         {
