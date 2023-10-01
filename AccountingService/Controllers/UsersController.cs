@@ -16,11 +16,12 @@ namespace AccountingService.Controllers
         private SalaryConversionContext salaryConversionContext;
         private ExchangeRateService exchangeRateService;
         private NetSalaryService netSalaryService;
-        public UsersController(SalaryConversionContext context) : base()
+        public UsersController(SalaryConversionContext context, IConfiguration config) : base()
         {
+            
             salaryConversionContext = context;
-            exchangeRateService = new ExchangeRateService();
-            netSalaryService = new NetSalaryService();
+            exchangeRateService = new ExchangeRateService(config);
+            netSalaryService = new NetSalaryService();   
         }
 
         [HttpGet]  
