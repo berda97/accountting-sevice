@@ -31,7 +31,6 @@ namespace AccountingService.Services
             {
                 Value = new JwtSecurityTokenHandler().WriteToken(token),
                 ValidTo = token.ValidTo,
-
             };
         }
     }
