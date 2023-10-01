@@ -4,6 +4,7 @@ using AccountingService.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using AccountingService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,12 @@ builder.Services.AddAuthentication(x =>
         IssuerSigningKey = new SymmetricSecurityKey(Key)
     };
 });
+
+builder.Services.AddScoped<JwtTokenService>(); //addscoped tip registracije
+builder.Services.AddScoped<ClaimsService>();
+builder.Services.AddScoped<NetSalaryService>();
+builder.Services.AddScoped<ExchangeRateService>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddCors();

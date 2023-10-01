@@ -20,13 +20,11 @@ namespace AccountingService.Controllers
         private SalaryConversionContext salaryConversionContext;
         private JwtTokenService jwtTokenSevice;
         private ClaimsService claimsSevice;
-        private IConfiguration configuration;
-        public AuthenticationController(SalaryConversionContext context, IConfiguration config) : base()
+        public AuthenticationController(SalaryConversionContext context,ClaimsService claims,JwtTokenService jwtToken) : base()
         {
-            configuration = config;
             salaryConversionContext = context;
-            jwtTokenSevice = new JwtTokenService(configuration);
-            claimsSevice = new ClaimsService();
+            jwtTokenSevice = jwtToken;
+            claimsSevice = claims;
         }
 
         [HttpPost("register")]
@@ -48,7 +46,6 @@ namespace AccountingService.Controllers
                 {
                     return BadRequest("Password must contain at least 8 characters, lowercase and uppercase letters, numbers, and special characters.");
                 }
-
                 user.Email = request.Email;
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
