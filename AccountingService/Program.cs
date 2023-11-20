@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using AccountingService.Services;
+using AccountingService.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,12 @@ builder.Services.AddScoped<JwtTokenService>(); //addscoped tip registracije
 builder.Services.AddScoped<ClaimsService>();
 builder.Services.AddScoped<NetSalaryService>();
 builder.Services.AddScoped<ExchangeRateService>();
+builder.Services.AddScoped<ITimeService>(provider =>
+{
+    int minutes = 15;
+    return new TimeService(minutes);
+});
+
 
 
 builder.Services.AddControllers();
