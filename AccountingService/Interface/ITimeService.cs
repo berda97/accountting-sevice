@@ -2,7 +2,6 @@
 {
     public interface ITimeService
     {
-        int Minutes { get; }
-        DateTime Now { get; }
+        DateTime Now { get;  }
     }
 }

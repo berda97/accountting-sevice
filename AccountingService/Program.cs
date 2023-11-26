@@ -36,10 +36,9 @@ builder.Services.AddScoped<NetSalaryService>();
 builder.Services.AddScoped<ExchangeRateService>();
 builder.Services.AddScoped<ITimeService>(provider =>
 {
-    int minutes = 15;
+    int minutes = builder.Configuration.GetValue<int>("JwtConfig:ExpiryInMinutes");
     return new TimeService(minutes);
 });
-
 
 
 builder.Services.AddControllers();

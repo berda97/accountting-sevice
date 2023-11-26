@@ -34,22 +34,25 @@ namespace UnitTestProject
             configurationMock.SetupGet(x => x["JwtConfig:Key"]).Returns("your_newly_generated_128_bit_key_here");
             configurationMock.SetupGet(x => x["JwtConfig:Issuer"]).Returns("your_issuer");
             configurationMock.SetupGet(x => x["JwtConfig:Audience"]).Returns("your_audience");
+            configurationMock.Setup(x => x["JwtConfig:ExpiryInMinutes"]).Returns("15");
+
+            timeServiceMock.Setup(ts => ts.Now).Returns(() => DateTime.UtcNow.AddMinutes(20));
+
 
             _configuration = configurationMock.Object;
             _timeService = timeServiceMock.Object;
-            _claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Email, "Miki123"),
-        };
-      }
 
-    
+            _claims = new List<Claim>
+            {
+            new Claim(ClaimTypes.Email, "Miki123"),
+            };
+        }
+
         [TestCase]
         public void GetToken_ReturnsValidJwtToken()
         {
             var jwtTokenService = new JwtTokenService(_configuration, _timeService);
             var token = jwtTokenService.GetToken(_claims);
-
 
             Assert.NotNull(token);
 
@@ -75,7 +78,6 @@ namespace UnitTestProject
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = tokenHandler.ReadJwtToken(token.Value);
 
-
             Assert.IsFalse(securityToken.Claims.Any(c => c.Type == ClaimTypes.Email && c.Value == "neispravan_email"));
         }
         [TestCase]
@@ -90,7 +92,7 @@ namespace UnitTestProject
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = tokenHandler.ReadJwtToken(token.Value);
 
-            // Očekujmo da Issuer nije ispravan
+            // Let's expect the Issuer to be incorrect
             Assert.That(securityToken.Issuer, Is.Not.EqualTo("neispravan_issuer"));
         }
 
@@ -106,27 +108,15 @@ namespace UnitTestProject
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = tokenHandler.ReadJwtToken(token.Value);
 
-            // Očekujmo da Audience nije ispravan
+            // Let's expect that the Audience is not valid
             Assert.That(securityToken.Audiences.FirstOrDefault(), Is.Not.EqualTo("neispravan_audience"));
         }
         [TestCase]
         public void GetToken_ReturnsInvalidJwtTokenForExpiredToken()
         {
-            var fakeClock = new FakeClock(NodaConstants.UnixEpoch);
             var jwtTokenService = new JwtTokenService(_configuration, _timeService);
-            var token = jwtTokenService.GetToken(_claims);
-
-            fakeClock.Advance(Duration.FromMinutes(20));
-
-            Assert.NotNull(token);
-            Assert.NotNull(token.Value);
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            // Očekujte da se baci SecurityTokenExpiredException zbog isteklog vremena
-            Assert.Throws<SecurityTokenExpiredException>(() => tokenHandler.ReadJwtToken(token.Value));
-
-
+            // Act & Assert
+            Assert.Throws<SecurityTokenExpiredException>(() => jwtTokenService.GetToken(_claims));
         }
     }
 }
