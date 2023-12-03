@@ -7,6 +7,10 @@
         const double pensionRate = 0.05;
         public double Calculate( double grossSalary)
         {
+            if (grossSalary < 0)
+            {
+                throw new ArgumentException("Gross salary cannot be negative.");
+            }
             double tax = grossSalary * taxRate;
             double socialSecurity = grossSalary * socialSecurityRate;
             double pension = grossSalary * pensionRate;
