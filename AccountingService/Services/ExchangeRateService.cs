@@ -22,7 +22,7 @@ namespace AccountingService.Services
             ReloadExchangeRates();
             return _exchangeRates[currency].Value<double>();
         }
-        public   void ReloadExchangeRates()
+        private void ReloadExchangeRates()
         {
             if (_exchangeRates != null && (DateTime.Now - _lastUpdate) < UpdateInterval)
             {
