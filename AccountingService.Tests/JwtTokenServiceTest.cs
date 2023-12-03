@@ -8,15 +8,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using SystemWrapper;
-
 using NUnit.Framework;
 using Microsoft.IdentityModel.Tokens;
-using NodaTime.Testing;
-using NodaTime;
 using AccountingService.Interface;
 
-namespace UnitTestProject
+namespace AccountingService.Tests
 {
     [TestFixture]
     public class JwtTokenServiceTest
@@ -36,7 +32,7 @@ namespace UnitTestProject
             configurationMock.SetupGet(x => x["JwtConfig:Audience"]).Returns("your_audience");
             configurationMock.Setup(x => x["JwtConfig:ExpiryInMinutes"]).Returns("15");
 
-            timeServiceMock.Setup(ts => ts.Now).Returns(new DateTime(2023, 1, 1, 12, 0, 0,DateTimeKind.Utc));
+            timeServiceMock.Setup(ts => ts.Now).Returns(new DateTime(2023, 1, 1, 12, 0, 0, DateTimeKind.Utc));
 
 
             _configuration = configurationMock.Object;
@@ -62,7 +58,7 @@ namespace UnitTestProject
             Assert.That(securityToken.Issuer, Is.EqualTo("your_issuer"));
             Assert.That(securityToken.Audiences.FirstOrDefault(), Is.EqualTo("your_audience"));
             Assert.IsNotNull(securityToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email && c.Value == "Miki123"));
-            Assert.That(securityToken.ValidTo,Is.EqualTo(new DateTime(2023, 1, 1, 12, 15, 0, DateTimeKind.Utc)));
+            Assert.That(securityToken.ValidTo, Is.EqualTo(new DateTime(2023, 1, 1, 12, 15, 0, DateTimeKind.Utc)));
         }
         [TestCase]
         public void GetToken_ReturnsInvalidJwtTokenForInvalidEmail()
@@ -110,7 +106,7 @@ namespace UnitTestProject
             // Let's expect that the Audience is not valid
             Assert.That(securityToken.Audiences.FirstOrDefault(), Is.Not.EqualTo("neispravan_audience"));
         }
-        
+
     }
 }
 

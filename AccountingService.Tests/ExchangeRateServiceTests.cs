@@ -46,9 +46,7 @@ namespace AccountingService.Tests
         public void GetCurrencyExchangeRate_ReturnsDefaultRateForNonexistentCurrency()
         {
             var exchangeRateService = new ExchangeRateService(_configuration);
-            var nonexistentCurrency = "XYZ"; // Zamena sa stvarnom nepostojećom valutom
-
-            // Ako valuta ne postoji ili podaci o kursu nisu ažurirani, očekujemo da se vrati podrazumevana vrednost (1)
+            var nonexistentCurrency = "XYZ";  
             var result = exchangeRateService.GetCurrencyExchangeRate(nonexistentCurrency);
 
             Assert.AreEqual(1, result);
