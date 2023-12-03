@@ -36,7 +36,7 @@ namespace UnitTestProject
             configurationMock.SetupGet(x => x["JwtConfig:Audience"]).Returns("your_audience");
             configurationMock.Setup(x => x["JwtConfig:ExpiryInMinutes"]).Returns("15");
 
-            timeServiceMock.Setup(ts => ts.Now).Returns(() => DateTime.UtcNow.AddMinutes(20));
+            timeServiceMock.Setup(ts => ts.Now).Returns(new DateTime(2023, 1, 1, 12, 0, 0,DateTimeKind.Utc));
 
 
             _configuration = configurationMock.Object;
@@ -55,15 +55,14 @@ namespace UnitTestProject
             var token = jwtTokenService.GetToken(_claims);
 
             Assert.NotNull(token);
-
             Assert.NotNull(token.Value);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = tokenHandler.ReadJwtToken(token.Value);
             Assert.That(securityToken.Issuer, Is.EqualTo("your_issuer"));
             Assert.That(securityToken.Audiences.FirstOrDefault(), Is.EqualTo("your_audience"));
-            Assert.IsTrue(securityToken.Claims.Any(c => c.Type == ClaimTypes.Email && c.Value == "Miki123"));
-            Assert.True(securityToken.ValidTo > DateTime.UtcNow);
+            Assert.IsNotNull(securityToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email && c.Value == "Miki123"));
+            Assert.That(securityToken.ValidTo,Is.EqualTo(new DateTime(2023, 1, 1, 12, 15, 0, DateTimeKind.Utc)));
         }
         [TestCase]
         public void GetToken_ReturnsInvalidJwtTokenForInvalidEmail()
@@ -111,13 +110,7 @@ namespace UnitTestProject
             // Let's expect that the Audience is not valid
             Assert.That(securityToken.Audiences.FirstOrDefault(), Is.Not.EqualTo("neispravan_audience"));
         }
-        [TestCase]
-        public void GetToken_ReturnsInvalidJwtTokenForExpiredToken()
-        {
-            var jwtTokenService = new JwtTokenService(_configuration, _timeService);
-            // Act & Assert
-            Assert.Throws<SecurityTokenExpiredException>(() => jwtTokenService.GetToken(_claims));
-        }
+        
     }
 }
 

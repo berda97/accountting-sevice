@@ -27,14 +27,10 @@ namespace AccountingService.Services
                 claims: claims,
                 issuer: _configuration["JwtConfig:Issuer"],
                 audience: _configuration["JwtConfig:Audience"],
-                expires: DateTime.UtcNow.AddMinutes(expiryInMinutes),
+                expires: _timeService.Now.AddMinutes(expiryInMinutes),
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
 
-            if (_timeService.Now > token.ValidTo)
-            {
-                throw new SecurityTokenExpiredException("Token has already expired.");
-            }
 
             return new Token
             {
