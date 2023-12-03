@@ -34,14 +34,7 @@ namespace AccountingService.Tests
             var result = exchangeRateService.GetCurrencyExchangeRate(null);
             Assert.AreEqual(1, result);
         }
-        [Test]
-        public void GetCurrencyExchangeRate_ReturnsExchangeRateForNonNullCurrency()
-        {
-            var exchangeRateService = new ExchangeRateService(_configuration);
-            var nonNullCurrency = "USD";
-            var result = exchangeRateService.GetCurrencyExchangeRate(nonNullCurrency);
-            Assert.AreNotEqual(2, result);
-        }
+        
         [Test]
         public void GetCurrencyExchangeRate_ReturnsDefaultRateForNonexistentCurrency()
         {

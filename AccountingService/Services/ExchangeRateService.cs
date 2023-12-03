@@ -5,9 +5,9 @@ namespace AccountingService.Services
 {
     public class ExchangeRateService
     {
-        private static JToken _exchangeRates;
-        private static DateTime _lastUpdate;
-        public virtual TimeSpan UpdateInterval => TimeSpan.FromDays(1);
+        private JToken _exchangeRates;
+        private DateTime _lastUpdate;
+        private static readonly TimeSpan UpdateInterval = TimeSpan.FromDays(1);
         private readonly IConfiguration _configuration;
         public ExchangeRateService(IConfiguration config)
         {
@@ -15,7 +15,7 @@ namespace AccountingService.Services
         }
         public double GetCurrencyExchangeRate(string currency)
         {
-            if (currency == null || _exchangeRates == null || _exchangeRates.SelectToken(currency) == null) 
+            if (currency == null ) 
             {
                 return 1;
             }
