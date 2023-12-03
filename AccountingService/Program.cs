@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(x =>
 builder.Services.AddScoped<JwtTokenService>(); 
 builder.Services.AddScoped<ClaimsService>();
 builder.Services.AddScoped<NetSalaryService>();
-builder.Services.AddScoped<ExchangeRateService>();
+builder.Services.AddSingleton<ExchangeRateService>();
 builder.Services.AddScoped<ITimeService,TimeService>();
 
 
